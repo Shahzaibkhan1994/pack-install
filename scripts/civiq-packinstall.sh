@@ -1,10 +1,15 @@
 #!/bin/bash
 
-wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.buster_amd64.deb
-dpkg -i  wkhtmltox_0.12.6-1.buster_amd64.deb
-apt install -f
-wkhtmltopdf  -V
-
+if [[ -f /usr/local/bin/wkhtmltopdf ]]
+then
+    echo "WKHTMLTOPDF already installed."
+else
+    echo "Installing WKHTMLTOPDF."
+    wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.buster_amd64.deb
+    dpkg -i  wkhtmltox_0.12.6-1.buster_amd64.deb
+    apt install -f
+    wkhtmltopdf  -V
+fi
 
 if [[ -f /etc/clamav/clamd.conf ]]
 then
@@ -18,6 +23,7 @@ else
     sed -i 's#MaxConnectionQueueLength 15#MaxConnectionQueueLength 50#g' clamd.conf
     sed -i 's#PCREMaxFileSize 25M#PCREMaxFileSize 250M#g' clamd.conf
     sed -i 's#StreamMaxLength 25M#StreamMaxLength 250M#g' clamd.conf
+    /etc/init.d/clamav-daemon restart
 fi
 
 if [[ -f /etc/monit/conf.cloudways/clamav.conf ]]
@@ -31,6 +37,8 @@ else
     sed -i '/User clamav/a PidFile /var/run/clamav/clamd.ctl' /etc/clamav/clamd.conf
     /etc/init.d/monit restart
 fi
+
+echo "Installing Pre-requisite packages."
 
 apt-get install swftools -y 
 apt-get install xpdf -y
