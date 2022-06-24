@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#SCRIPT-OWNER SHAHZAIB
+
 if [[ -f /usr/local/bin/wkhtmltopdf ]]
 then
     echo "WKHTMLTOPDF already installed."
